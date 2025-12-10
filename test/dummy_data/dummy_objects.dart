@@ -1,7 +1,10 @@
-import 'package:ditonton/data/models/movie_table.dart';
+import 'package:ditonton/data/models/movie/movie_table.dart';
+import 'package:ditonton/data/models/tv_series/tv_series_table.dart';
 import 'package:ditonton/domain/entities/genre.dart';
 import 'package:ditonton/domain/entities/movie.dart';
 import 'package:ditonton/domain/entities/movie_detail.dart';
+import 'package:ditonton/domain/entities/tv_series.dart';
+import 'package:ditonton/domain/entities/tv_series_detail.dart';
 
 final testMovie = Movie(
   adult: false,
@@ -21,6 +24,7 @@ final testMovie = Movie(
 );
 
 final testMovieList = [testMovie];
+final testTvSeriesList = [testTvSeries];
 
 final testMovieDetail = MovieDetail(
   adult: false,
@@ -36,6 +40,39 @@ final testMovieDetail = MovieDetail(
   voteAverage: 1,
   voteCount: 1,
 );
+final testTvSeries = TvSeries(
+  adult: false,
+  backdropPath: 'backdropPath',
+  genreIds: [1, 2, 3],
+  id: 1,
+  name: 'name',
+  overview: 'overview',
+  popularity: 1,
+  posterPath: 'posterPath',
+  firstAirDate: DateTime.parse('2025-10-18 10:57:15.140834'),
+  originalLanguage: "originalLanguage",
+  originalName: "originalName",
+  originCountry: ["originCountry"],
+  voteAverage: 1,
+  voteCount: 1,
+);
+
+final testTvSeriesDetail = TvSeriesDetail(
+  adult: false,
+  backdropPath: 'backdropPath',
+  genreIds: [1, 2, 3],
+  id: 1,
+  name: 'name',
+  overview: 'overview',
+  popularity: 1,
+  posterPath: 'posterPath',
+  firstAirDate: DateTime.parse('2025-10-18 10:57:15.140834'),
+  originalLanguage: "originalLanguage",
+  originalName: "originalName",
+  originCountry: ["originCountry"],
+  voteAverage: 1,
+  voteCount: 1,
+);
 
 final testWatchlistMovie = Movie.watchlist(
   id: 1,
@@ -44,7 +81,21 @@ final testWatchlistMovie = Movie.watchlist(
   overview: 'overview',
 );
 
+final testWatchlistTvSeries = TvSeries.watchlist(
+  id: 1,
+  name: 'title',
+  posterPath: 'posterPath',
+  overview: 'overview',
+);
+
 final testMovieTable = MovieTable(
+  id: 1,
+  title: 'title',
+  posterPath: 'posterPath',
+  overview: 'overview',
+);
+
+final testTvSeriesTable = TvSeriesTable(
   id: 1,
   title: 'title',
   posterPath: 'posterPath',
