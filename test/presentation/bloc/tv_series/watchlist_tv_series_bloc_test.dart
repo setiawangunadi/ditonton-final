@@ -4,13 +4,14 @@ import 'package:ditonton/common/failure.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/usecases/tv_series/get_watchlist_tv_series.dart';
 import 'package:ditonton/presentation/bloc/tv_series/watchlist_tv_series_bloc.dart';
-import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-class MockGetWatchlistTvSeries extends Mock
-    implements GetWatchlistTvSeries {}
+import '../../../dummy_data/dummy_objects.dart';
+import '../../provider/tv_series/watchlist_tv_series_notifier.mocks.dart';
 
+@GenerateMocks([GetWatchlistTvSeries])
 void main() {
   late WatchlistTvSeriesBloc bloc;
   late MockGetWatchlistTvSeries mockGetWatchlistTvSeries;
@@ -61,4 +62,3 @@ void main() {
     ],
   );
 }
-

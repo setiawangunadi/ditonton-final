@@ -6,17 +6,17 @@ import 'package:ditonton/domain/usecases/tv_series/get_now_playing_tv_series.dar
 import 'package:ditonton/domain/usecases/tv_series/get_popular_tv_series.dart';
 import 'package:ditonton/domain/usecases/tv_series/get_top_rated_tv_series.dart';
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
+import 'package:mockito/annotations.dart';
 import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockGetNowPlayingTvSeries extends Mock
-    implements GetNowPlayingTvSeries {}
-
-class MockGetPopularTvSeries extends Mock implements GetPopularTvSeries {}
-
-class MockGetTopRatedTvSeries extends Mock implements GetTopRatedTvSeries {}
-
+import '../../provider/tv_series/tv_series_list_notifier.mocks.dart';
+@GenerateMocks([
+  GetNowPlayingTvSeries,
+  GetPopularTvSeries,
+  GetTopRatedTvSeries,
+])
 void main() {
   late TvSeriesListBloc bloc;
   late MockGetNowPlayingTvSeries mockGetNowPlayingTvSeries;

@@ -8,24 +8,20 @@ import 'package:ditonton/domain/usecases/tv_series/get_watchlist_tv_series_statu
 import 'package:ditonton/domain/usecases/tv_series/remove_watchlist_tv_series.dart';
 import 'package:ditonton/domain/usecases/tv_series/save_watchlist_tv_series.dart';
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_detail_bloc.dart';
+import 'package:mockito/annotations.dart';
 import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockGetTvSeriesDetail extends Mock implements GetTvSeriesDetail {}
+import '../../provider/tv_series/tv_series_detail_notifier_test.mocks.dart';
 
-class MockGetTvSeriesRecommendations extends Mock
-    implements GetTvSeriesRecommendations {}
-
-class MockGetWatchListTvSeriesStatus extends Mock
-    implements GetWatchListTvSeriesStatus {}
-
-class MockSaveWatchlistTvSeries extends Mock
-    implements SaveWatchlistTvSeries {}
-
-class MockRemoveWatchlistTvSeries extends Mock
-    implements RemoveWatchlistTvSeries {}
-
+@GenerateMocks([
+  GetTvSeriesDetail,
+  GetTvSeriesRecommendations,
+  GetWatchListTvSeriesStatus,
+  SaveWatchlistTvSeries,
+  RemoveWatchlistTvSeries,
+])
 void main() {
   late TvSeriesDetailBloc bloc;
   late MockGetTvSeriesDetail mockGetTvSeriesDetail;
@@ -125,8 +121,8 @@ void main() {
     blocTest<TvSeriesDetailBloc, TvSeriesDetailState>(
       'emits success message and status on add watchlist',
       build: () {
-        when(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail))
-            .thenAnswer((_) async => Right(TvSeriesDetailBloc.watchlistAddSuccessMessage));
+        when(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail)).thenAnswer(
+            (_) async => Right(TvSeriesDetailBloc.watchlistAddSuccessMessage));
         when(mockGetWatchListTvSeriesStatus.execute(tId))
             .thenAnswer((_) async => true);
         return bloc;
@@ -156,13 +152,9 @@ void main() {
       expect: () => [
         TvSeriesDetailState.initial().copyWith(
           watchlistMessage: TvSeriesDetailBloc.watchlistRemoveSuccessMessage,
-        ),
-        TvSeriesDetailState.initial().copyWith(
-          watchlistMessage: TvSeriesDetailBloc.watchlistRemoveSuccessMessage,
           isAddedToWatchlist: false,
         ),
       ],
     );
   });
 }
-

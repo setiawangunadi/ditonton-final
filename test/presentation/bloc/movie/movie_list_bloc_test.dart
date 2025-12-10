@@ -6,16 +6,17 @@ import 'package:ditonton/domain/usecases/get_now_playing_movies.dart';
 import 'package:ditonton/domain/usecases/get_popular_movies.dart';
 import 'package:ditonton/domain/usecases/get_top_rated_movies.dart';
 import 'package:ditonton/presentation/bloc/movie/movie_list_bloc.dart';
+import 'package:mockito/annotations.dart';
 import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockGetNowPlayingMovies extends Mock implements GetNowPlayingMovies {}
-
-class MockGetPopularMovies extends Mock implements GetPopularMovies {}
-
-class MockGetTopRatedMovies extends Mock implements GetTopRatedMovies {}
-
+import '../../provider/movie/movie_list_notifier_test.mocks.dart';
+@GenerateMocks([
+  GetNowPlayingMovies,
+  GetPopularMovies,
+  GetTopRatedMovies,
+])
 void main() {
   late MovieListBloc bloc;
   late MockGetNowPlayingMovies mockGetNowPlayingMovies;

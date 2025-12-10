@@ -4,12 +4,16 @@ import 'package:ditonton/common/failure.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/usecases/search_movies.dart';
 import 'package:ditonton/presentation/bloc/movie/movie_search_bloc.dart';
+import 'package:mockito/annotations.dart';
 import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockSearchMovies extends Mock implements SearchMovies {}
+import '../../provider/movie/movie_search_notifier_test.mocks.dart';
 
+@GenerateMocks([
+  SearchMovies,
+])
 void main() {
   late MovieSearchBloc bloc;
   late MockSearchMovies mockSearchMovies;

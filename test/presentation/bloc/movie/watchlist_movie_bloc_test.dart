@@ -2,13 +2,12 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:ditonton/common/failure.dart';
 import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/domain/usecases/get_watchlist_movies.dart';
 import 'package:ditonton/presentation/bloc/movie/watchlist_movie_bloc.dart';
-import '../../../dummy_data/dummy_objects.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class MockGetWatchlistMovies extends Mock implements GetWatchlistMovies {}
+import '../../../dummy_data/dummy_objects.dart';
+import '../../provider/movie/watchlist_movie_notifier_test.mocks.dart';
 
 void main() {
   late WatchlistMovieBloc bloc;
