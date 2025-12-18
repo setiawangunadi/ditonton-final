@@ -27,7 +27,7 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
 
   final http.Client? client;
 
-  MovieRemoteDataSourceImpl({required this.client});
+  MovieRemoteDataSourceImpl({this.client});
 
   Future<http.Client> get _httpClient async {
     if (client != null) {
