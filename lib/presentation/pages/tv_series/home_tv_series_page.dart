@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv_series.dart';
+import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
 import 'package:ditonton/presentation/pages/about_page.dart';
 import 'package:ditonton/presentation/pages/movie/home_movie_page.dart';
 import 'package:ditonton/presentation/pages/tv_series/popular_tv_series_page.dart';
@@ -9,7 +10,8 @@ import 'package:ditonton/presentation/pages/tv_series/search_tv_series_page.dart
 import 'package:ditonton/presentation/pages/tv_series/top_rated_tv_series_page.dart';
 import 'package:ditonton/presentation/pages/tv_series/tv_series_detail_page.dart';
 import 'package:ditonton/presentation/pages/tv_series/watchlist_tv_series_page.dart';
-import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -80,6 +82,17 @@ class _HomeTvSeriesPageState extends State<HomeTvSeriesPage> {
               leading: Icon(Icons.info_outline),
               title: Text('About'),
             ),
+            if (kDebugMode)
+              ListTile(
+                leading: Icon(Icons.bug_report),
+                title: Text('Force Crash (debug)'),
+                subtitle: Text('Sends a test crash to Crashlytics'),
+                onTap: () {
+                  FirebaseCrashlytics.instance
+                      .log('Test crash triggered from drawer');
+                  FirebaseCrashlytics.instance.crash();
+                },
+              ),
           ],
         ),
       ),
@@ -131,11 +144,9 @@ class _HomeTvSeriesPageState extends State<HomeTvSeriesPage> {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (state.popularTvSeriesState ==
-                    RequestState.Loaded) {
+                } else if (state.popularTvSeriesState == RequestState.Loaded) {
                   return TvSeriesList(state.popularTvSeries);
-                } else if (state.popularTvSeriesState ==
-                    RequestState.Error) {
+                } else if (state.popularTvSeriesState == RequestState.Error) {
                   return Text(state.message);
                 } else {
                   return Text('Failed');
@@ -152,11 +163,9 @@ class _HomeTvSeriesPageState extends State<HomeTvSeriesPage> {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (state.topRatedTvSeriesState ==
-                    RequestState.Loaded) {
+                } else if (state.topRatedTvSeriesState == RequestState.Loaded) {
                   return TvSeriesList(state.topRatedTvSeries);
-                } else if (state.topRatedTvSeriesState ==
-                    RequestState.Error) {
+                } else if (state.topRatedTvSeriesState == RequestState.Error) {
                   return Text(state.message);
                 } else {
                   return Text('Failed');

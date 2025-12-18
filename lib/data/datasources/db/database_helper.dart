@@ -37,19 +37,24 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY,
         title TEXT,
         overview TEXT,
-        posterPath TEXT
+        posterPath TEXT,
+        type TEXT
       );
     ''');
   }
 
   Future<int> insertWatchlist(MovieTable movie) async {
     final db = await database;
-    return await db!.insert(_tblWatchlist, movie.toJson());
+    final data = movie.toJson();
+    data['type'] = 'movie';
+    return await db!.insert(_tblWatchlist, data);
   }
 
   Future<int> insertWatchlistTvSeries(TvSeriesTable tvSeries) async {
     final db = await database;
-    return await db!.insert(_tblWatchlist, tvSeries.toJson());
+    final data = tvSeries.toJson();
+    data['type'] = 'tvSeries';
+    return await db!.insert(_tblWatchlist, data);
   }
 
   Future<int> removeWatchlist(MovieTable movie) async {
@@ -102,14 +107,22 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getWatchlistMovies() async {
     final db = await database;
-    final List<Map<String, dynamic>> results = await db!.query(_tblWatchlist);
+    final List<Map<String, dynamic>> results = await db!.query(
+      _tblWatchlist,
+      where: 'type = ?',
+      whereArgs: ['movie'],
+    );
 
     return results;
   }
 
   Future<List<Map<String, dynamic>>> getWatchlistTvSeries() async {
     final db = await database;
-    final List<Map<String, dynamic>> results = await db!.query(_tblWatchlist);
+    final List<Map<String, dynamic>> results = await db!.query(
+      _tblWatchlist,
+      where: 'type = ?',
+      whereArgs: ['tvSeries'],
+    );
 
     return results;
   }
