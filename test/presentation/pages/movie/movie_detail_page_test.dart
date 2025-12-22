@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/movie.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/movie/movie_detail_bloc.dart';
 import 'package:ditonton/presentation/pages/movie/movie_detail_page.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +17,15 @@ import '../../../dummy_data/dummy_objects.dart';
 class MockMovieDetailBloc extends MockBloc<MovieDetailEvent, MovieDetailState>
     implements MovieDetailBloc {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class MovieDetailEventFake extends Fake implements MovieDetailEvent {}
 
 class MovieDetailStateFake extends Fake implements MovieDetailState {}
 
 void main() {
   late MockMovieDetailBloc mockMovieDetailBloc;
+  late MockAnalyticsService mockAnalyticsService;
   late StreamController<MovieDetailState> movieDetailStateController;
 
   setUpAll(() {
@@ -30,14 +35,38 @@ void main() {
 
   setUp(() {
     mockMovieDetailBloc = MockMovieDetailBloc();
+    mockAnalyticsService = MockAnalyticsService();
     movieDetailStateController = StreamController<MovieDetailState>.broadcast();
     when(() => mockMovieDetailBloc.stream)
         .thenAnswer((_) => movieDetailStateController.stream);
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
+    di.locator.registerLazySingleton<AnalyticsService>(() => mockAnalyticsService);
+    when(() => mockAnalyticsService.logScreenView(
+          screenName: any(named: 'screenName'),
+          screenClass: any(named: 'screenClass'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logMovieView(
+          movieId: any(named: 'movieId'),
+          movieTitle: any(named: 'movieTitle'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logAddMovieToWatchlist(
+          movieId: any(named: 'movieId'),
+          movieTitle: any(named: 'movieTitle'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logRemoveMovieFromWatchlist(
+          movieId: any(named: 'movieId'),
+          movieTitle: any(named: 'movieTitle'),
+        )).thenAnswer((_) async => {});
   });
 
   tearDown(() {
     movieDetailStateController.close();
     mockMovieDetailBloc.close();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
   });
 
   Widget _makeTestableWidget(Widget body) {

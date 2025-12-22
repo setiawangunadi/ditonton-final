@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv_series.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
 import 'package:ditonton/presentation/pages/tv_series/popular_tv_series_page.dart';
 import 'package:ditonton/presentation/widgets/tv_series_card_list.dart';
@@ -13,12 +15,15 @@ class MockTvSeriesListBloc
     extends MockBloc<TvSeriesListEvent, TvSeriesListState>
     implements TvSeriesListBloc {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class TvSeriesListStateFake extends Fake implements TvSeriesListState {}
 
 class TvSeriesListEventFake extends Fake implements TvSeriesListEvent {}
 
 void main() {
   late MockTvSeriesListBloc mockTvSeriesListBloc;
+  late MockAnalyticsService mockAnalyticsService;
 
   setUpAll(() {
     registerFallbackValue(TvSeriesListEventFake());
@@ -27,10 +32,20 @@ void main() {
 
   setUp(() {
     mockTvSeriesListBloc = MockTvSeriesListBloc();
+    mockAnalyticsService = MockAnalyticsService();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
+    di.locator.registerLazySingleton<AnalyticsService>(() => mockAnalyticsService);
+    when(() => mockAnalyticsService.logViewPopularTvSeries())
+        .thenAnswer((_) async => {});
   });
 
   tearDown(() {
     mockTvSeriesListBloc.close();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
   });
 
   Widget _makeTestableWidget(Widget body) {

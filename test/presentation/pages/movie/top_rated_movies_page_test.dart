@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/movie.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/movie/movie_list_bloc.dart';
 import 'package:ditonton/presentation/pages/movie/top_rated_movies_page.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +13,15 @@ import 'package:mocktail/mocktail.dart';
 class MockMovieListBloc extends MockBloc<MovieListEvent, MovieListState>
     implements MovieListBloc {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class MovieListStateFake extends Fake implements MovieListState {}
 
 class MovieListEventFake extends Fake implements MovieListEvent {}
 
 void main() {
   late MockMovieListBloc mockMovieListBloc;
+  late MockAnalyticsService mockAnalyticsService;
 
   setUpAll(() {
     registerFallbackValue(MovieListEventFake());
@@ -25,10 +30,20 @@ void main() {
 
   setUp(() {
     mockMovieListBloc = MockMovieListBloc();
+    mockAnalyticsService = MockAnalyticsService();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
+    di.locator.registerLazySingleton<AnalyticsService>(() => mockAnalyticsService);
+    when(() => mockAnalyticsService.logViewTopRatedMovies())
+        .thenAnswer((_) async => {});
   });
 
   tearDown(() {
     mockMovieListBloc.close();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
   });
 
   Widget _makeTestableWidget(Widget body) {

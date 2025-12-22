@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv_series.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_detail_bloc.dart';
 import 'package:ditonton/presentation/pages/tv_series/tv_series_detail_page.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +18,15 @@ class MockTvSeriesDetailBloc
     extends MockBloc<TvSeriesDetailEvent, TvSeriesDetailState>
     implements TvSeriesDetailBloc {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class TvSeriesDetailEventFake extends Fake implements TvSeriesDetailEvent {}
 
 class TvSeriesDetailStateFake extends Fake implements TvSeriesDetailState {}
 
 void main() {
   late MockTvSeriesDetailBloc mockTvSeriesDetailBloc;
+  late MockAnalyticsService mockAnalyticsService;
   late StreamController<TvSeriesDetailState> tvSeriesDetailStateController;
 
   setUpAll(() {
@@ -31,15 +36,39 @@ void main() {
 
   setUp(() {
     mockTvSeriesDetailBloc = MockTvSeriesDetailBloc();
+    mockAnalyticsService = MockAnalyticsService();
     tvSeriesDetailStateController =
         StreamController<TvSeriesDetailState>.broadcast();
     when(() => mockTvSeriesDetailBloc.stream)
         .thenAnswer((_) => tvSeriesDetailStateController.stream);
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
+    di.locator.registerLazySingleton<AnalyticsService>(() => mockAnalyticsService);
+    when(() => mockAnalyticsService.logScreenView(
+          screenName: any(named: 'screenName'),
+          screenClass: any(named: 'screenClass'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logTvSeriesView(
+          tvSeriesId: any(named: 'tvSeriesId'),
+          tvSeriesTitle: any(named: 'tvSeriesTitle'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logAddTvSeriesToWatchlist(
+          tvSeriesId: any(named: 'tvSeriesId'),
+          tvSeriesTitle: any(named: 'tvSeriesTitle'),
+        )).thenAnswer((_) async => {});
+    when(() => mockAnalyticsService.logRemoveTvSeriesFromWatchlist(
+          tvSeriesId: any(named: 'tvSeriesId'),
+          tvSeriesTitle: any(named: 'tvSeriesTitle'),
+        )).thenAnswer((_) async => {});
   });
 
   tearDown(() {
     tvSeriesDetailStateController.close();
     mockTvSeriesDetailBloc.close();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
   });
 
   Widget _makeTestableWidget(Widget body) {

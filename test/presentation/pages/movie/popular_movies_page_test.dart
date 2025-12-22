@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/movie.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/movie/movie_list_bloc.dart';
 import 'package:ditonton/presentation/pages/movie/popular_movies_page.dart';
 import 'package:ditonton/presentation/widgets/movie_card_list.dart';
@@ -12,12 +14,15 @@ import 'package:mocktail/mocktail.dart';
 class MockMovieListBloc extends MockBloc<MovieListEvent, MovieListState>
     implements MovieListBloc {}
 
+class MockAnalyticsService extends Mock implements AnalyticsService {}
+
 class MovieListStateFake extends Fake implements MovieListState {}
 
 class MovieListEventFake extends Fake implements MovieListEvent {}
 
 void main() {
   late MockMovieListBloc mockMovieListBloc;
+  late MockAnalyticsService mockAnalyticsService;
 
   setUpAll(() {
     registerFallbackValue(MovieListEventFake());
@@ -26,10 +31,20 @@ void main() {
 
   setUp(() {
     mockMovieListBloc = MockMovieListBloc();
+    mockAnalyticsService = MockAnalyticsService();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
+    di.locator.registerLazySingleton<AnalyticsService>(() => mockAnalyticsService);
+    when(() => mockAnalyticsService.logViewPopularMovies())
+        .thenAnswer((_) async => {});
   });
 
   tearDown(() {
     mockMovieListBloc.close();
+    if (di.locator.isRegistered<AnalyticsService>()) {
+      di.locator.unregister<AnalyticsService>();
+    }
   });
 
   final tMovie = Movie(
