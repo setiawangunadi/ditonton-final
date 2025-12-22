@@ -1,3 +1,4 @@
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/data/datasources/db/database_helper.dart';
 import 'package:ditonton/data/datasources/movie_local_data_source.dart';
 import 'package:ditonton/data/datasources/movie_remote_data_source.dart';
@@ -35,6 +36,7 @@ import 'package:ditonton/presentation/bloc/tv_series/tv_series_detail_bloc.dart'
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_search_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_series/watchlist_tv_series_bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
@@ -147,6 +149,12 @@ void init() {
 
   // helper
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
+
+  // analytics
+  locator.registerLazySingleton(() => FirebaseAnalytics.instance);
+  locator.registerLazySingleton<AnalyticsService>(
+    () => AnalyticsService(locator<FirebaseAnalytics>()),
+  );
 
   // external
   locator.registerLazySingleton(() => http.Client());

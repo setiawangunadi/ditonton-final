@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv_series.dart';
 import 'package:ditonton/domain/entities/tv_series_detail.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_detail_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -21,16 +23,54 @@ class TvSeriesDetailPage extends StatefulWidget {
 
 class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
   @override
+  void initState() {
+    super.initState();
+    // Track TV series detail page view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      di.locator<AnalyticsService>().logScreenView(
+        screenName: 'tv_series_detail',
+        screenClass: 'TvSeriesDetailPage',
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<TvSeriesDetailBloc, TvSeriesDetailState>(
         listenWhen: (prev, curr) =>
-            prev.watchlistMessage != curr.watchlistMessage &&
-            curr.watchlistMessage.isNotEmpty,
+            (prev.tvSeriesState != curr.tvSeriesState &&
+                curr.tvSeriesState == RequestState.Loaded) ||
+            (prev.watchlistMessage != curr.watchlistMessage &&
+                curr.watchlistMessage.isNotEmpty),
         listener: (context, state) {
+          // Track TV series view when loaded
+          if (state.tvSeriesState == RequestState.Loaded &&
+              state.tvSeries != null) {
+            di.locator<AnalyticsService>().logTvSeriesView(
+              tvSeriesId: state.tvSeries!.id,
+              tvSeriesTitle: state.tvSeries!.name,
+            );
+          }
+
+          // Track watchlist actions
           final message = state.watchlistMessage;
-          if (message == TvSeriesDetailBloc.watchlistAddSuccessMessage ||
-              message == TvSeriesDetailBloc.watchlistRemoveSuccessMessage) {
+          if (message == TvSeriesDetailBloc.watchlistAddSuccessMessage) {
+            if (state.tvSeries != null) {
+              di.locator<AnalyticsService>().logAddTvSeriesToWatchlist(
+                tvSeriesId: state.tvSeries!.id,
+                tvSeriesTitle: state.tvSeries!.name,
+              );
+            }
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(message)));
+          } else if (message == TvSeriesDetailBloc.watchlistRemoveSuccessMessage) {
+            if (state.tvSeries != null) {
+              di.locator<AnalyticsService>().logRemoveTvSeriesFromWatchlist(
+                tvSeriesId: state.tvSeries!.id,
+                tvSeriesTitle: state.tvSeries!.name,
+              );
+            }
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(message)));
           } else if (message.isNotEmpty) {

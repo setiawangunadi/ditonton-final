@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/domain/entities/genre.dart';
 import 'package:ditonton/domain/entities/movie.dart';
 import 'package:ditonton/domain/entities/movie_detail.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/movie/movie_detail_bloc.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:flutter/material.dart';
@@ -22,16 +24,53 @@ class MovieDetailPage extends StatefulWidget {
 
 class _MovieDetailPageState extends State<MovieDetailPage> {
   @override
+  void initState() {
+    super.initState();
+    // Track movie view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      di.locator<AnalyticsService>().logScreenView(
+        screenName: 'movie_detail',
+        screenClass: 'MovieDetailPage',
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocConsumer<MovieDetailBloc, MovieDetailState>(
         listenWhen: (prev, curr) =>
-            prev.watchlistMessage != curr.watchlistMessage &&
-            curr.watchlistMessage.isNotEmpty,
+            (prev.movieState != curr.movieState &&
+                curr.movieState == RequestState.Loaded) ||
+            (prev.watchlistMessage != curr.watchlistMessage &&
+                curr.watchlistMessage.isNotEmpty),
         listener: (context, state) {
+          // Track movie view when loaded
+          if (state.movieState == RequestState.Loaded && state.movie != null) {
+            di.locator<AnalyticsService>().logMovieView(
+              movieId: state.movie!.id,
+              movieTitle: state.movie!.title,
+            );
+          }
+
+          // Track watchlist actions
           final message = state.watchlistMessage;
-          if (message == MovieDetailBloc.watchlistAddSuccessMessage ||
-              message == MovieDetailBloc.watchlistRemoveSuccessMessage) {
+          if (message == MovieDetailBloc.watchlistAddSuccessMessage) {
+            if (state.movie != null) {
+              di.locator<AnalyticsService>().logAddMovieToWatchlist(
+                movieId: state.movie!.id,
+                movieTitle: state.movie!.title,
+              );
+            }
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(message)));
+          } else if (message == MovieDetailBloc.watchlistRemoveSuccessMessage) {
+            if (state.movie != null) {
+              di.locator<AnalyticsService>().logRemoveMovieFromWatchlist(
+                movieId: state.movie!.id,
+                movieTitle: state.movie!.title,
+              );
+            }
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(message)));
           } else if (message.isNotEmpty) {

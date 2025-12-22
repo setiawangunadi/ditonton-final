@@ -1,4 +1,6 @@
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/movie/movie_list_bloc.dart';
 import 'package:ditonton/presentation/widgets/movie_card_list.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,10 @@ class _PopularMoviesPageState extends State<PopularMoviesPage> {
   @override
   void initState() {
     super.initState();
+    // Track popular movies page view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      di.locator<AnalyticsService>().logViewPopularMovies();
+    });
     Future.microtask(
       () => context.read<MovieListBloc>().add(FetchPopularMovies()),
     );

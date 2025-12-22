@@ -1,4 +1,6 @@
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
 import 'package:ditonton/presentation/widgets/tv_series_card_list.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,10 @@ class _PopularTvSeriesPageState extends State<PopularTvSeriesPage> {
   @override
   void initState() {
     super.initState();
+    // Track popular TV series page view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      di.locator<AnalyticsService>().logViewPopularTvSeries();
+    });
     Future.microtask(
       () => context.read<TvSeriesListBloc>().add(FetchPopularTvSeries()),
     );

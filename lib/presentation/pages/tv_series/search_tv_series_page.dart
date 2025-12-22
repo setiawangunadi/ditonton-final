@@ -1,5 +1,7 @@
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_search_bloc.dart';
 import 'package:ditonton/presentation/widgets/tv_series_card_list.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,13 @@ class SearchTvSeriesPage extends StatelessWidget {
           children: [
             TextField(
               onSubmitted: (query) {
+                // Track search event
+                if (query.isNotEmpty) {
+                  di.locator<AnalyticsService>().logSearch(
+                    searchTerm: query,
+                    contentType: 'tv_series',
+                  );
+                }
                 context
                     .read<TvSeriesSearchBloc>()
                     .add(TvSeriesQueryChanged(query));

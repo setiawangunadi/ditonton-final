@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/common/utils.dart';
 import 'package:ditonton/firebase_options.dart';
@@ -23,6 +24,7 @@ import 'package:ditonton/presentation/bloc/tv_series/tv_series_detail_bloc.dart'
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_list_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_series/tv_series_search_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_series/watchlist_tv_series_bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
@@ -46,6 +48,10 @@ void main() async {
       return true;
     };
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
+    // Initialize Firebase Analytics
+    final analytics = FirebaseAnalytics.instance;
+    await analytics.setAnalyticsCollectionEnabled(true);
 
     di.init();
     runApp(MyApp());
@@ -88,7 +94,10 @@ class MyApp extends StatelessWidget {
           drawerTheme: kDrawerTheme,
         ),
         home: HomeMoviePage(),
-        navigatorObservers: [routeObserver],
+        navigatorObservers: [
+          routeObserver,
+          di.locator<AnalyticsService>().observer,
+        ],
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case HomeMoviePage.ROUTE_NAME:

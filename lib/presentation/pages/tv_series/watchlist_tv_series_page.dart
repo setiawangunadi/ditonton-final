@@ -1,5 +1,7 @@
+import 'package:ditonton/common/analytics_service.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/common/utils.dart';
+import 'package:ditonton/injection.dart' as di;
 import 'package:ditonton/presentation/bloc/tv_series/watchlist_tv_series_bloc.dart';
 import 'package:ditonton/presentation/widgets/tv_series_card_list.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,10 @@ class _WatchlistTvSeriesPageState extends State<WatchlistTvSeriesPage>
   @override
   void initState() {
     super.initState();
+    // Track watchlist page view
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      di.locator<AnalyticsService>().logViewWatchlist(contentType: 'tv_series');
+    });
     Future.microtask(
       () => context
           .read<WatchlistTvSeriesBloc>()
